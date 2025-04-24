@@ -8,6 +8,7 @@ const userRoute = require('./routes/user.route')
 const eventRoute = require('./routes/event.route')
 const registrationRoute = require('./routes/registration.route')
 const reviewRoute = require('./routes/review.route')
+const paypalRoutes = require('./routes/paypal.route');
 
 const app = express()
 
@@ -24,6 +25,7 @@ app.use('/api/user',userRoute)
 app.use('/api/event',eventRoute)
 app.use('/api/registration',registrationRoute)
 app.use('/api/review',reviewRoute)
+app.use('/api/paypal', paypalRoutes);
 
 app.listen(port, ()=>{
     console.log(`server is listenning on ${port}`);
