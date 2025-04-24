@@ -9,13 +9,8 @@ const notificationSchema = new mongoose.Schema({
     type: {
         type: String,
         enum: [
-            'event_reminder',
-            'registration_confirmation',
-            'payment_receipt',
-            'event_update',
-            'event_cancellation',
-            'refund_processed',
-            'promotional'
+            'registration',
+            'review_response'
         ],
         required: true
     },

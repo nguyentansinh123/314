@@ -19,7 +19,6 @@ const reviewSchema = new mongoose.Schema({
     },
     title: String,
     comment: String,
-    images: [String],
     isVerified: {
         type: Boolean,
         default: false

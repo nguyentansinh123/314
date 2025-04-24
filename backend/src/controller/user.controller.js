@@ -1,4 +1,6 @@
 const UserModel = require('../models/user.model')
+const cloudinary = require('../config/cloudinary');
+
 const getAllUser = async (req, res) => {
 
     try {
@@ -73,21 +75,36 @@ const deleteUser = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const { userId, profilePic } = req.body;
+        const { userId } = req.body;
         console.log("User ID:", userId);
         
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }
 
-        if (!profilePic) {
-            return res.status(400).json({ message: "Profile picture is required" });
+
+        if (!req.file) {
+            return res.status(400).json({ message: "Profile picture file is required" });
         }
 
         // upload to cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: "profile_pictures"
+        });
+        console.log(req.body.userId)
 
-        const updatedUser = await UserModel.findByIdAndUpdate(userId, {profilePic: profilePic }, {new:true})
-        res.status(200).json(updatedUser)
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            userId,
+            { profilePicture: result.secure_url },
+            { new: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Profile picture updated",
+            profilePicture: result.secure_url,
+            user: updatedUser
+        });
     } catch (error) {
         
         console.log(error)

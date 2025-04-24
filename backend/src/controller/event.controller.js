@@ -1,9 +1,10 @@
 const Event = require('../models/event.model')
+const cloudinary = require('../config/cloudinary');
 
 
 const createEvent = async (req, res) => {
     try {
-        const {
+        let {
             title,
             description,
             category,
@@ -11,12 +12,19 @@ const createEvent = async (req, res) => {
             endDate,
             location,
             ticketTypes,
-            images,
             tags,
             status,
             refundPolicy,
             socialLinks
         } = req.body;
+
+        console.log("Request body:", req.body);
+        
+
+        if (typeof location === 'string') location = JSON.parse(location);
+        if (typeof ticketTypes === 'string') ticketTypes = JSON.parse(ticketTypes);
+        if (typeof tags === 'string') tags = JSON.parse(tags);
+        if (typeof socialLinks === 'string') socialLinks = JSON.parse(socialLinks);
 
         if (!title || !description || !category || !startDate || !endDate || !location) {
             return res.status(400).json({
@@ -24,14 +32,12 @@ const createEvent = async (req, res) => {
                 error: 'Missing required fields: title, description, category, dates, or location'
             });
         }
-
         if (!location.venue || !location.address || !location.address.city || !location.address.country) {
             return res.status(400).json({
                 success: false,
                 error: 'Location must include venue, city, and country'
             });
         }
-
         if (ticketTypes && ticketTypes.length > 0) {
             for (const ticket of ticketTypes) {
                 if (!ticket.name || ticket.price === undefined || ticket.quantity === undefined) {
@@ -64,26 +70,36 @@ const createEvent = async (req, res) => {
                 error: 'Start date must be in the future'
             });
         }
-
         if (end <= start) {
             return res.status(400).json({
                 success: false,
                 error: 'End date must be after start date'
             });
         }
-
         if (status && !['draft', 'published', 'cancelled', 'completed'].includes(status)) {
             return res.status(400).json({
                 success: false,
                 error: 'Invalid status value'
             });
         }
-
         if (refundPolicy && !['no_refunds', 'full_refund_before_event', 'partial_refund_before_event'].includes(refundPolicy)) {
             return res.status(400).json({
                 success: false,
                 error: 'Invalid refund policy value'
             });
+        }
+
+        let images = [];
+        if (req.files && req.files.length > 0) {
+            for (const [i, file] of req.files.entries()) {
+                const result = await cloudinary.uploader.upload(file.path, {
+                    folder: "event_images"
+                });
+                images.push({
+                    url: result.secure_url,
+                    isFeatured: i === 0 
+                });
+            }
         }
 
         const eventData = {
@@ -93,13 +109,13 @@ const createEvent = async (req, res) => {
             startDate: start,
             endDate: end,
             location,
-            organizer: req.user.userId, 
+            organizer: req.body.userId,
             status: status || 'draft',
             refundPolicy: refundPolicy || 'no_refunds',
             ...(ticketTypes && { ticketTypes }),
-            ...(images && { images }),
             ...(tags && { tags }),
-            ...(socialLinks && { socialLinks })
+            ...(socialLinks && { socialLinks }),
+            images
         };
 
         const event = await Event.create(eventData);
@@ -129,7 +145,6 @@ const createEvent = async (req, res) => {
         });
     }
 };
-
 
 const getAllEvents = async (req, res) => {
     try {
@@ -174,7 +189,6 @@ const getEvent = async (req, res) => {
             });
         }
         
-        // Increment views
         event.views += 1;
         await event.save();
         
@@ -199,56 +213,70 @@ const getEvent = async (req, res) => {
 const updateEvent = async (req, res) => {
     try {
         let event = await Event.findById(req.params.id);
-        
+
         if (!event) {
             return res.status(404).json({
                 success: false,
                 error: 'Event not found'
             });
         }
-        
+
         if (event.organizer.toString() !== req.user.id) {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to update this event'
             });
         }
-        
+
         if (event.status === 'published') {
-            const restrictedFields = ['startDate', 'endDate', 'location', 'organizer'];
+            const restrictedFields = ['startDate', 'location', 'organizer'];
             for (const field of restrictedFields) {
-                if (req.body[field]) {
+                if (req.body[field] !== undefined) {
                     return res.status(400).json({
                         success: false,
                         error: `Cannot update ${field} for a published event`
                     });
                 }
             }
+            if (req.body.status && req.body.status !== 'published') {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Cannot change status of a published event'
+                });
+            }
         }
-        
-        event = await Event.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        });
-        
+
+        if (typeof req.body.location === 'string') {
+            req.body.location = JSON.parse(req.body.location);
+        }
+        if (typeof req.body.ticketTypes === 'string') {
+            req.body.ticketTypes = JSON.parse(req.body.ticketTypes);
+        }
+        if (typeof req.body.tags === 'string') {
+            req.body.tags = JSON.parse(req.body.tags);
+        }
+        if (typeof req.body.socialLinks === 'string') {
+            req.body.socialLinks = JSON.parse(req.body.socialLinks);
+        }
+
+        if (req.body.startDate) {
+            event.startDate = new Date(req.body.startDate);
+        }
+        if (req.body.endDate) {
+            event.endDate = new Date(req.body.endDate);
+        }
+
+        if (!(event.status === 'published' && req.body.status)) {
+            Object.assign(event, req.body);
+        }
+        await event.save();
+        console.log(req.body)
+
         res.json({
             success: true,
             data: event
         });
     } catch (err) {
-        if (err.kind === 'ObjectId') {
-            return res.status(404).json({
-                success: false,
-                error: 'Event not found'
-            });
-        }
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(val => val.message);
-            return res.status(400).json({
-                success: false,
-                error: messages
-            });
-        }
         res.status(500).json({
             success: false,
             error: 'Server Error: ' + err.message
@@ -267,7 +295,7 @@ const deleteEvent = async (req, res) => {
             });
         }
         
-        if (event.organizer.toString() !== req.user.id) {
+        if (event.organizer.toString() !== req.body.userId) {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to delete this event'
@@ -282,8 +310,8 @@ const deleteEvent = async (req, res) => {
                 error: 'Cannot delete event with tickets sold. Cancel instead.'
             });
         }
-        
-        await event.remove();
+
+        await event.deleteOne();
         
         res.json({
             success: true,
@@ -314,7 +342,7 @@ const cancelEvent = async (req, res) => {
             });
         }
         
-        if (event.organizer.toString() !== req.user.id) {
+        if (event.organizer.toString() !== req.body.userId) {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to cancel this event'
@@ -375,7 +403,7 @@ const publishEvent = async (req, res) => {
             });
         }
         
-        if (event.organizer.toString() !== req.user.id) {
+        if (event.organizer.toString() !== req.body.userId) {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to publish this event'
@@ -428,7 +456,7 @@ const addTicketType = async (req, res) => {
             });
         }
         
-        if (event.organizer.toString() !== req.user.id) {
+        if (event.organizer.toString() !== req.body.userId) {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to add tickets to this event'
@@ -500,7 +528,7 @@ const updateTicketType = async (req, res) => {
             });
         }
         
-        if (event.organizer.toString() !== req.user.id) {
+        if (event.organizer.toString() !== req.body.userId) {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to update tickets for this event'
@@ -578,7 +606,7 @@ const deleteTicketType = async (req, res) => {
             });
         }
         
-        if (event.organizer.toString() !== req.user.id) {
+        if (event.organizer.toString() !== req.body.userId) {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to delete tickets from this event'
