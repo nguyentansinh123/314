@@ -1,0 +1,121 @@
+.success-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.success-content {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 48px 32px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.success-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.success-content h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+.success-message {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 32px;
+}
+
+.order-confirmation {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.order-confirmation-detail {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.order-confirmation-detail:last-child {
+  border-bottom: none;
+}
+
+.email-note {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 32px;
+}
+
+.success-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.primary-button {
+  background-color: #3b82f6;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.primary-button:hover {
+  background-color: #2563eb;
+}
+
+.secondary-button {
+  background-color: transparent;
+  border: 1px solid #d1d5db;
+  color: #4b5563;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondary-button:hover {
+  background-color: #f9fafb;
+}
+
+.buy-btn {
+  background-color: #10b981;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buy-btn:hover {
+  background-color: #059669;
+}
+
+@media (max-width: 640px) {
+  .success-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .order-confirmation {
+    padding: 16px;
+  }
+}
