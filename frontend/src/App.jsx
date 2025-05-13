@@ -11,20 +11,37 @@ import SinglePage from "./components/SinglePage/SinglePage";
 import PaymentSuccess from "./components/Payment/PaymentSuccess";
 import Payment from "./components/Payment/Payment";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import Profile from "./components/Profile/Profile";
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/event/:id" element={<SinglePage />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path="/create-event" element={<CreateEvent />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/event/:id" element={<SinglePage />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+          </Route>
+          
+          <Route element={<ProtectedRoute allowedRoles={['organizer', 'admin']} />}>
+            <Route path="/create-event" element={<CreateEvent />} />
+          </Route>
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+          
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

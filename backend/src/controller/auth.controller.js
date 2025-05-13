@@ -176,8 +176,7 @@ const verifiedEmail = async (req,res)=>{
 
 const isAuthenticated = async(req,res)=>{
     try {
-        res.json({success: true})
-        
+        res.json({success: true, role: req.user.role})
     } catch (error) {
         res.json({success: false, message: error.message})
     }

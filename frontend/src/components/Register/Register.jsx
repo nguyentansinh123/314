@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
+import { useAuth } from '../../context/AuthContext';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -8,10 +9,35 @@ const Register = () => {
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { register } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Registration attempt with:', { name, email, dateOfBirth, password });
+    setLoading(true);
+    setError('');
+    
+    try {
+      const success = await register({
+        name,
+        email,
+        dateOfBirth,
+        password
+      });
+      
+      if (success) {
+        navigate('/');
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    } catch (error) {
+      console.log(error)
+      setError('An error occurred during registration');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -20,6 +46,8 @@ const Register = () => {
         <div className="register-form">
           <h1>Sign up</h1>
           <p className="register-subtitle">Sign up to enjoy the features of Revolute</p>
+          
+          {error && <div className="error-message">{error}</div>}
           
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -88,7 +116,13 @@ const Register = () => {
               </div>
             </div>
             
-            <button type="submit" className="sign-up-btn">Sign up</button>
+            <button 
+              type="submit" 
+              className="sign-up-btn" 
+              disabled={loading}
+            >
+              {loading ? 'Signing up...' : 'Sign up'}
+            </button>
             
             <div className="divider">or</div>
             

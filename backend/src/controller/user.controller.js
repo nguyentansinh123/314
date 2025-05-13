@@ -87,7 +87,6 @@ const updateProfile = async (req, res) => {
             return res.status(400).json({ message: "Profile picture file is required" });
         }
 
-        // upload to cloudinary
         const result = await cloudinary.uploader.upload(req.file.path, {
             folder: "profile_pictures"
         });

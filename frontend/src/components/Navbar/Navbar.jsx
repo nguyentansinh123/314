@@ -1,8 +1,27 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) {
+      navigate('/login');
+    }
+  };
+  
+  const handleProfileClick = () => {
+    if (user) {
+      navigate('/profile');
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <nav className="main-nav">
       <div className="nav-left">
@@ -40,12 +59,42 @@ const Navbar = () => {
             <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
           </svg>
         </button>
-        <button className="user-btn">
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
-            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </button>
+        <div className="user-profile" onClick={handleProfileClick}>
+          {user ? (
+            <div className="user-info">
+              <span className="user-name">{user.name}</span>
+              <div className="avatar-container">
+                {user.profilePicture ? (
+                  <img 
+                    src={user.profilePicture} 
+                    alt={user.name} 
+                    className="user-avatar" 
+                  />
+                ) : (
+                  <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" fill="none">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                )}
+              </div>
+              <div className="user-dropdown">
+                <div className="dropdown-item dropdown-item-profile" onClick={() => navigate('/profile')}>
+                  My Profile
+                </div>
+                <div className="dropdown-item dropdown-item-logout" onClick={handleLogout}>
+                  Logout
+                </div>
+              </div>
+            </div>
+          ) : (
+            <button className="user-btn" onClick={() => navigate('/login')}>
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
     </nav>
   );
