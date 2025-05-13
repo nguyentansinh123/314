@@ -13,6 +13,7 @@ import Payment from "./components/Payment/Payment";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Profile from "./components/Profile/Profile";
+import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
           </Route>
           
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>

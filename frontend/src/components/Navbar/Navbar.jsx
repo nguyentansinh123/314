@@ -40,6 +40,19 @@ const Navbar = () => {
         </div>
       </div>
       <div className="nav-right">
+        {/* Add Admin Dashboard link here, outside of user dropdown */}
+        {user && user.role === 'admin' && (
+          <Link to="/admin/dashboard" className="admin-dashboard-link">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Admin</span>
+          </Link>
+        )}
+        
         <button className="location-btn">
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
@@ -81,6 +94,12 @@ const Navbar = () => {
                 <div className="dropdown-item dropdown-item-profile" onClick={() => navigate('/profile')}>
                   My Profile
                 </div>
+                {/* Add admin dashboard link in dropdown as well for easier access */}
+                {user.role === 'admin' && (
+                  <div className="dropdown-item dropdown-item-admin" onClick={() => navigate('/admin/dashboard')}>
+                    Admin Dashboard
+                  </div>
+                )}
                 <div className="dropdown-item dropdown-item-logout" onClick={handleLogout}>
                   Logout
                 </div>
