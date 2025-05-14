@@ -231,6 +231,30 @@
   background-position: center;
 }
 
+.create-event-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #5d35f0;
+  color: white;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  margin-right: 12px;
+}
+
+.create-event-nav-btn:hover {
+  background-color: #4a2cc2;
+  color: white;
+}
+
+.create-event-nav-btn svg {
+  stroke-width: 2;
+}
+
 @media (max-width: 768px) {
   .admin-link {
     padding: 6px 8px;
@@ -247,5 +271,14 @@
   
   .admin-dashboard-link span {
     display: none;
+  }
+
+  .create-event-nav-btn span {
+    display: none;
+  }
+  
+  .create-event-nav-btn {
+    padding: 8px;
+    margin-right: 8px;
   }
 }

@@ -17,7 +17,6 @@ const AdminDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch all users on component mount
   useEffect(() => {
     if (!user || user.role !== 'admin') {
       navigate('/');
@@ -78,7 +77,6 @@ const AdminDashboard = () => {
         setSuccess(`User ${editingUser.name}'s role updated successfully to ${editedRole}`);
         setEditingUser(null);
         
-        // Update the users list
         const updatedUsers = users.map(user => 
           user._id === editingUser._id ? {...user, role: editedRole} : user
         );
@@ -115,7 +113,6 @@ const AdminDashboard = () => {
       if (response.data.message === "User deleted successfully") {
         setSuccess('User deleted successfully');
         
-        // Update the users list
         const updatedUsers = users.filter(user => user._id !== userId);
         setUsers(updatedUsers);
       } else {
@@ -129,7 +126,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Filter users based on search query
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase())

@@ -53,6 +53,16 @@ const Navbar = () => {
           </Link>
         )}
         
+        {user && (user.role === 'organizer' || user.role === 'admin') && (
+          <Link to="/create-event" className="create-event-nav-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Create Event</span>
+          </Link>
+        )}
+
         <button className="location-btn">
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />

@@ -11,6 +11,7 @@ import SinglePage from "./components/SinglePage/SinglePage";
 import PaymentSuccess from "./components/Payment/PaymentSuccess";
 import Payment from "./components/Payment/Payment";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
+import EditEvent from "./components/EditEvent/EditEvent";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Profile from "./components/Profile/Profile";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
@@ -33,6 +34,7 @@ function App() {
           
           <Route element={<ProtectedRoute allowedRoles={['organizer', 'admin']} />}>
             <Route path="/create-event" element={<CreateEvent />} />
+            <Route path="/edit-event/:id" element={<EditEvent />} />
           </Route>
           
           <Route element={<ProtectedRoute />}>

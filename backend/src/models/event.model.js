@@ -61,7 +61,7 @@ const eventSchema = new mongoose.Schema({
         validate: {
             validator: async function(value) {
                 const user = await mongoose.model('User').findById(value);
-                return user && user.role === 'organizer';
+                return user && (user.role === 'organizer' || user.role === 'admin');
             },
             message: 'Organizer must be a user with organizer role'
         }

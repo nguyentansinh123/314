@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import Navbar from '../Navbar/Navbar';
-import './CreateEvent.css';
+import '../CreateEvent/CreateEvent.css'; 
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
-const CreateEvent = () => {
+const EditEvent = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); 
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [originalImages, setOriginalImages] = useState([]);
 
   const [eventData, setEventData] = useState({
     title: '',
@@ -37,19 +39,18 @@ const CreateEvent = () => {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
 
-  const [ticketTypes, setTicketTypes] = useState([
-    {
-      name: 'General Admission',
-      description: 'Standard ticket with access to all basic event features',
-      price: 0,
-      quantity: 100,
-      benefits: [],
-      isVIP: false
-    }
-  ]);
+  const [ticketTypes, setTicketTypes] = useState([{
+    name: 'General Admission',
+    description: 'Standard ticket with access to all basic event features',
+    price: 0,
+    quantity: 100,
+    benefits: [],
+    isVIP: false
+  }]);
 
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreview, setImagePreview] = useState([]);
+  const [imagesToDelete, setImagesToDelete] = useState([]);
 
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
@@ -68,10 +69,87 @@ const CreateEvent = () => {
     
     if (user.role !== 'admin' && user.role !== 'organizer') {
       navigate('/');
-      setError('Only organizers and admins can create events');
+      setError('Only organizers and admins can edit events');
       return;
     }
-  }, [user, navigate]);
+
+    fetchEventData();
+  }, [user, navigate, id]);
+
+  const fetchEventData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`http://localhost:5000/api/event/${id}`, {
+        withCredentials: true
+      });
+
+      if (response.data.success) {
+        const event = response.data.data;
+        
+        if (user.role !== 'admin' && event.organizer._id !== user._id) {
+          navigate('/');
+          setError('You are not authorized to edit this event');
+          return;
+        }
+
+        setEventData({
+          title: event.title,
+          description: event.description,
+          category: event.category,
+          location: event.location,
+          refundPolicy: event.refundPolicy || 'no_refunds',
+          status: event.status || 'draft'
+        });
+
+        if (event.startDate) {
+          const startDateTime = new Date(event.startDate);
+          setStartDate(startDateTime);
+          setStartTime(formatTime(startDateTime));
+        }
+
+        if (event.endDate) {
+          const endDateTime = new Date(event.endDate);
+          setEndDate(endDateTime);
+          setEndTime(formatTime(endDateTime));
+        }
+
+        if (event.ticketTypes && event.ticketTypes.length > 0) {
+          setTicketTypes(event.ticketTypes);
+        }
+
+        if (event.tags && event.tags.length > 0) {
+          setTags(event.tags);
+        }
+
+        if (event.socialLinks) {
+          setSocialLinks({
+            facebookEvent: event.socialLinks.facebookEvent || '',
+            twitterHashtag: event.socialLinks.twitterHashtag || '',
+            instagramHandle: event.socialLinks.instagramHandle || ''
+          });
+        }
+
+        if (event.images && event.images.length > 0) {
+          setOriginalImages(event.images);
+          setImagePreview(event.images.map(img => img.url));
+        }
+      } else {
+        setError('Failed to load event data');
+      }
+    } catch (error) {
+      console.error('Error loading event data:', error);
+      setError('An error occurred while loading the event. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatTime = (date) => {
+    if (!date) return '';
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -139,6 +217,13 @@ const CreateEvent = () => {
     if (ticketTypes.length === 1) {
       return; 
     }
+    
+    const ticket = ticketTypes[index];
+    if (ticket._id && ticket.sold && ticket.sold > 0) {
+      setError(`Cannot remove "${ticket.name}" - tickets have already been sold.`);
+      return;
+    }
+    
     const updatedTickets = ticketTypes.filter((_, i) => i !== index);
     setTicketTypes(updatedTickets);
   };
@@ -154,14 +239,21 @@ const CreateEvent = () => {
   };
 
   const removeImage = (index) => {
+    if (index < originalImages.length) {
+      setImagesToDelete([...imagesToDelete, originalImages[index]._id]);
+    }
+    
     const updatedFiles = [...imageFiles];
     const updatedPreviews = [...imagePreview];
     
-    URL.revokeObjectURL(updatedPreviews[index]);
+    if (index >= originalImages.length) {
+      URL.revokeObjectURL(updatedPreviews[index]);
+    }
     
-    updatedFiles.splice(index, 1);
+    if (index - originalImages.length >= 0) {
+      updatedFiles.splice(index - originalImages.length, 1);
+    }
     updatedPreviews.splice(index, 1);
-    
     setImageFiles(updatedFiles);
     setImagePreview(updatedPreviews);
   };
@@ -246,9 +338,13 @@ const CreateEvent = () => {
     formData.append('endDate', formattedEndDate);
     formData.append('status', eventData.status);
     formData.append('refundPolicy', eventData.refundPolicy);
-    formData.append('userId', user._id); 
+    formData.append('userId', user._id);
     formData.append('location', JSON.stringify(eventData.location));
     formData.append('ticketTypes', JSON.stringify(ticketTypes));
+    
+    if (imagesToDelete.length > 0) {
+      formData.append('imagesToDelete', JSON.stringify(imagesToDelete));
+    }
     
     if (tags.length > 0) {
       formData.append('tags', JSON.stringify(tags));
@@ -264,18 +360,9 @@ const CreateEvent = () => {
       });
     }
     
-    console.log('FormData contents:');
-    for (let [key, value] of formData.entries()) {
-      if (key !== 'images') { 
-        console.log(`${key}: ${value}`);
-      } else {
-        console.log(`${key}: [File data]`);
-      }
-    }
-    
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/event/createEvent',
+      const response = await axios.put(
+        `http://localhost:5000/api/event/updateEvent/${id}`,
         formData,
         { 
           withCredentials: true,
@@ -286,15 +373,15 @@ const CreateEvent = () => {
       );
       
       if (response.data.success) {
-        setSuccessMessage('Event created successfully!');
+        setSuccessMessage('Event updated successfully!');
         setTimeout(() => {
-          navigate('/event/' + response.data.data._id);
+          navigate('/event/' + id);
         }, 1500);
       } else {
-        setError(response.data.error || 'Failed to create event');
+        setError(response.data.error || 'Failed to update event');
       }
     } catch (error) {
-      console.error('Error creating event:', error);
+      console.error('Error updating event:', error);
       if (error.response) {
         console.error('Server error details:', error.response.data);
         setError(error.response.data.error || 'Server error: ' + error.response.status);
@@ -308,17 +395,43 @@ const CreateEvent = () => {
     }
   };
 
+  const isFieldReadOnly = (field) => {
+    if (eventData.status === 'published') {
+      const restrictedFields = ['startDate', 'location', 'venue'];
+      return restrictedFields.includes(field);
+    }
+    return false;
+  };
+
+  if (loading && !eventData.title) {
+    return (
+      <div className="create-event-container">
+        <Navbar />
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading event data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="create-event-container">
       <Navbar />
       
       <div className="create-event-content">
-        <h1>Create Event</h1>
+        <h1>Edit Event</h1>
         
         {error && <div className="error-message">{error}</div>}
         {successMessage && <div className="success-message">{successMessage}</div>}
+        {eventData.status === 'published' && (
+          <div className="info-message">
+            Note: Some fields cannot be changed after an event is published.
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="event-form">
+          {/* Basic Information Section */}
           <section className="form-section">
             <h2>Basic Information</h2>
             
@@ -462,6 +575,7 @@ const CreateEvent = () => {
             </div>
           </section>
           
+          {/* Date & Time Section */}
           <section className="form-section">
             <h2>Date & Time</h2>
             
@@ -479,6 +593,7 @@ const CreateEvent = () => {
                       required
                       minDate={new Date()}
                       wrapperClassName="date-picker-wrapper"
+                      disabled={isFieldReadOnly('startDate')}
                     />
                   </div>
                 </div>
@@ -492,6 +607,7 @@ const CreateEvent = () => {
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
                     required
+                    disabled={isFieldReadOnly('startDate')}
                   />
                 </div>
               </div>
@@ -528,6 +644,7 @@ const CreateEvent = () => {
             </div>
           </section>
           
+          {/* Location Section */}
           <section className="form-section">
             <h2>Location</h2>
             
@@ -549,6 +666,7 @@ const CreateEvent = () => {
                       }
                     })}
                     required
+                    disabled={isFieldReadOnly('venue')}
                   />
                 </div>
                 
@@ -561,6 +679,7 @@ const CreateEvent = () => {
                     placeholder="Street address"
                     value={eventData.location.address.street}
                     onChange={handleAddressChange}
+                    disabled={isFieldReadOnly('location')}
                   />
                 </div>
               </div>
@@ -577,6 +696,7 @@ const CreateEvent = () => {
                       value={eventData.location.address.city}
                       onChange={handleAddressChange}
                       required
+                      disabled={isFieldReadOnly('location')}
                     />
                   </div>
                   
@@ -589,6 +709,7 @@ const CreateEvent = () => {
                       placeholder="State/Province"
                       value={eventData.location.address.state}
                       onChange={handleAddressChange}
+                      disabled={isFieldReadOnly('location')}
                     />
                   </div>
                 </div>
@@ -603,6 +724,7 @@ const CreateEvent = () => {
                       placeholder="Zip/Postal Code"
                       value={eventData.location.address.zipCode}
                       onChange={handleAddressChange}
+                      disabled={isFieldReadOnly('location')}
                     />
                   </div>
                   
@@ -616,6 +738,7 @@ const CreateEvent = () => {
                       value={eventData.location.address.country}
                       onChange={handleAddressChange}
                       required
+                      disabled={isFieldReadOnly('location')}
                     />
                   </div>
                 </div>
@@ -623,6 +746,7 @@ const CreateEvent = () => {
             </div>
           </section>
           
+          {/* Tickets Section */}
           <section className="form-section">
             <h2>Tickets</h2>
             
@@ -634,6 +758,7 @@ const CreateEvent = () => {
                     type="button" 
                     className="remove-ticket"
                     onClick={() => removeTicketType(index)}
+                    disabled={ticket._id && ticket.sold && ticket.sold > 0}
                   >
                     Remove
                   </button>
@@ -649,6 +774,7 @@ const CreateEvent = () => {
                         value={ticket.name}
                         onChange={(e) => handleTicketChange(index, 'name', e.target.value)}
                         required
+                        disabled={eventData.status === 'published' && ticket._id}
                       />
                     </div>
                     
@@ -656,7 +782,7 @@ const CreateEvent = () => {
                       <label htmlFor={`ticketDesc-${index}`}>Description</label>
                       <textarea
                         id={`ticketDesc-${index}`}
-                        value={ticket.description}
+                        value={ticket.description || ''}
                         onChange={(e) => handleTicketChange(index, 'description', e.target.value)}
                         rows="2"
                       />
@@ -677,18 +803,21 @@ const CreateEvent = () => {
                             min="0"
                             step="0.01"
                             required
+                            disabled={eventData.status === 'published' && ticket._id}
                           />
                         </div>
                       </div>
                       
                       <div className="form-group half">
-                        <label htmlFor={`ticketQuantity-${index}`}>Quantity*</label>
+                        <label htmlFor={`ticketQuantity-${index}`}>
+                          Quantity* {ticket.sold > 0 && `(${ticket.sold} sold)`}
+                        </label>
                         <input
                           type="number"
                           id={`ticketQuantity-${index}`}
                           value={ticket.quantity}
                           onChange={(e) => handleTicketChange(index, 'quantity', Number(e.target.value))}
-                          min="1"
+                          min={ticket.sold || 1}
                           required
                         />
                       </div>
@@ -699,7 +828,7 @@ const CreateEvent = () => {
                         <input
                           type="checkbox"
                           id={`ticketVIP-${index}`}
-                          checked={ticket.isVIP}
+                          checked={ticket.isVIP || false}
                           onChange={(e) => handleTicketChange(index, 'isVIP', e.target.checked)}
                         />
                         <label htmlFor={`ticketVIP-${index}`}>VIP Ticket</label>
@@ -714,11 +843,13 @@ const CreateEvent = () => {
               type="button" 
               className="add-ticket-btn"
               onClick={addTicketType}
+              disabled={eventData.status === 'completed'}
             >
               Add Another Ticket Type
             </button>
           </section>
           
+          {/* Additional Settings */}
           <section className="form-section">
             <h2>Additional Settings</h2>
             
@@ -745,9 +876,12 @@ const CreateEvent = () => {
                     name="status"
                     value={eventData.status}
                     onChange={handleInputChange}
+                    disabled={eventData.status === 'completed' || eventData.status === 'cancelled'}
                   >
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
+                    {eventData.status === 'cancelled' && <option value="cancelled">Cancelled</option>}
+                    {eventData.status === 'completed' && <option value="completed">Completed</option>}
                   </select>
                 </div>
               </div>
@@ -795,8 +929,11 @@ const CreateEvent = () => {
           </section>
           
           <div className="form-actions">
+            <button type="button" className="cancel-btn" onClick={() => navigate(`/event/${id}`)}>
+              Cancel
+            </button>
             <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? 'Creating...' : 'Create Event'}
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
@@ -805,4 +942,4 @@ const CreateEvent = () => {
   );
 };
 
-export default CreateEvent;
+export default EditEvent;
