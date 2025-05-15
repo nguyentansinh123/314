@@ -31,6 +31,8 @@ router.post(
 
 router.put(
   "/updateEvent/:id",
+  extractUserId,
+  upload.array("images", 5),
   userAuth,
   authorizeRoles("admin", "organizer"),
   updateEvent
@@ -73,18 +75,21 @@ router.delete(
   deleteTicketType
 );
 
-// All user
+// Public routes - no authentication needed
+router.get("/public", getAllEvents);
+
+// Authenticated routes
 router.get(
   "/",
   userAuth,
   authorizeRoles("user", "admin", "organizer"),
   getAllEvents
 );
-router.get(
-  "/:id",
-  userAuth,
-  authorizeRoles("user", "admin", "organizer"),
-  getEvent
-);
+
+// Protected routes
+router.use(userAuth);
+router.use(authorizeRoles("user", "admin", "organizer"));
+
+router.get("/:id", getEvent);
 
 module.exports = router;

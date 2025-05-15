@@ -212,6 +212,8 @@ const getEvent = async (req, res) => {
 
 const updateEvent = async (req, res) => {
     try {
+        console.log("Update event called for ID:", req.params.id);
+        
         let event = await Event.findById(req.params.id);
 
         if (!event) {
@@ -221,62 +223,100 @@ const updateEvent = async (req, res) => {
             });
         }
 
-        if (event.organizer.toString() !== req.user.id) {
+        if (event.organizer.toString() !== req.body.userId && 
+            (!req.user || (req.user.role !== 'admin' && event.organizer.toString() !== req.user.id))) {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to update this event'
             });
         }
 
-        if (event.status === 'published') {
-            const restrictedFields = ['startDate', 'location', 'organizer'];
-            for (const field of restrictedFields) {
-                if (req.body[field] !== undefined) {
-                    return res.status(400).json({
-                        success: false,
-                        error: `Cannot update ${field} for a published event`
-                    });
-                }
-            }
-            if (req.body.status && req.body.status !== 'published') {
-                return res.status(400).json({
-                    success: false,
-                    error: 'Cannot change status of a published event'
-                });
-            }
-        }
-
         if (typeof req.body.location === 'string') {
             req.body.location = JSON.parse(req.body.location);
         }
+        
         if (typeof req.body.ticketTypes === 'string') {
             req.body.ticketTypes = JSON.parse(req.body.ticketTypes);
         }
+        
         if (typeof req.body.tags === 'string') {
             req.body.tags = JSON.parse(req.body.tags);
         }
+        
         if (typeof req.body.socialLinks === 'string') {
             req.body.socialLinks = JSON.parse(req.body.socialLinks);
         }
 
-        if (req.body.startDate) {
-            event.startDate = new Date(req.body.startDate);
-        }
-        if (req.body.endDate) {
-            event.endDate = new Date(req.body.endDate);
+        if (req.body.imagesToDelete) {
+            try {
+                const imagesToDelete = JSON.parse(req.body.imagesToDelete);
+                if (Array.isArray(imagesToDelete) && imagesToDelete.length > 0) {
+                    event.images = event.images.filter(img => 
+                        !imagesToDelete.includes(img._id.toString())
+                    );
+                    console.log("Images after deletion:", event.images);
+                }
+            } catch (err) {
+                console.error("Error parsing imagesToDelete:", err);
+            }
         }
 
-        if (!(event.status === 'published' && req.body.status)) {
-            Object.assign(event, req.body);
+        if (req.files && req.files.length > 0) {
+            console.log("Uploading new images:", req.files.length);
+            const newImages = [];
+            
+            for (const file of req.files) {
+                try {
+                    const result = await cloudinary.uploader.upload(file.path, {
+                        folder: "event_images"
+                    });
+                    
+                    newImages.push({
+                        url: result.secure_url,
+                        isFeatured: event.images.length === 0 && newImages.length === 0
+                    });
+                } catch (err) {
+                    console.error("Error uploading image to Cloudinary:", err);
+                }
+            }
+            
+            event.images = [...event.images, ...newImages];
+            console.log("Images after adding new ones:", event.images);
         }
+
+        if (req.body.title) event.title = req.body.title;
+        if (req.body.description) event.description = req.body.description;
+        if (req.body.category) event.category = req.body.category;
+        if (req.body.status && (event.status !== 'published' || req.body.status === 'published')) {
+            event.status = req.body.status;
+        }
+        if (req.body.refundPolicy) event.refundPolicy = req.body.refundPolicy;
+        if (req.body.ticketTypes) event.ticketTypes = req.body.ticketTypes;
+        if (req.body.tags) event.tags = req.body.tags;
+        if (req.body.socialLinks) event.socialLinks = req.body.socialLinks;
+        
+        if (event.status !== 'published') {
+            if (req.body.startDate) event.startDate = new Date(req.body.startDate);
+            if (req.body.endDate) event.endDate = new Date(req.body.endDate);
+            if (req.body.location) event.location = req.body.location;
+        }
+
         await event.save();
-        console.log(req.body)
+        console.log("Event updated successfully:", event._id);
 
         res.json({
             success: true,
             data: event
         });
     } catch (err) {
+        console.error("Error updating event:", err);
+        if (err.name === 'ValidationError') {
+            const messages = Object.values(err.errors).map(val => val.message);
+            return res.status(400).json({
+                success: false,
+                error: messages
+            });
+        }
         res.status(500).json({
             success: false,
             error: 'Server Error: ' + err.message
@@ -572,7 +612,7 @@ const updateTicketType = async (req, res) => {
         
         res.json({
             success: true,
-            data: event.ticketTypes[ticketIndex]
+            data: event.ticketTypes[ticketTypesIndex]
         });
     } catch (err) {
         if (err.kind === 'ObjectId') {

@@ -240,21 +240,24 @@ const EditEvent = () => {
 
   const removeImage = (index) => {
     if (index < originalImages.length) {
-      setImagesToDelete([...imagesToDelete, originalImages[index]._id]);
+      const imageToDelete = originalImages[index]._id;
+      setImagesToDelete(prev => [...prev, imageToDelete]);
+      
+      const updatedOriginalImages = [...originalImages];
+      updatedOriginalImages.splice(index, 1);
+      setOriginalImages(updatedOriginalImages);
     }
-    
-    const updatedFiles = [...imageFiles];
-    const updatedPreviews = [...imagePreview];
     
     if (index >= originalImages.length) {
-      URL.revokeObjectURL(updatedPreviews[index]);
+      const fileIndex = index - originalImages.length;
+      const updatedFiles = [...imageFiles];
+      URL.revokeObjectURL(imagePreview[index]);
+      updatedFiles.splice(fileIndex, 1);
+      setImageFiles(updatedFiles);
     }
     
-    if (index - originalImages.length >= 0) {
-      updatedFiles.splice(index - originalImages.length, 1);
-    }
+    const updatedPreviews = [...imagePreview];
     updatedPreviews.splice(index, 1);
-    setImageFiles(updatedFiles);
     setImagePreview(updatedPreviews);
   };
 

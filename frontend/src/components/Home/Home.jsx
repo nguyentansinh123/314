@@ -60,26 +60,19 @@ const Home = () => {
       setLoading(true);
       setError("");
 
-      const url = "http://localhost:5000/api/event";
-      
-      const config = user 
-        ? { withCredentials: true } 
-        : {};
-      
-      const response = await axios.get(url, config);
+      // Use the public endpoint that doesn't require auth
+      const url = "http://localhost:5000/api/event/public";
+      const response = await axios.get(url);
 
       if (response.data.success) {
         setEvents(response.data.data);
       } else {
         setError("Failed to fetch events");
+        loadPlaceholderEvents();
       }
     } catch (error) {
       console.error("Error fetching events:", error);
-      if (error.response && error.response.status === 401) {
-        loadPlaceholderEvents();
-      } else {
-        setError("An error occurred while fetching events");
-      }
+      loadPlaceholderEvents();
     } finally {
       setLoading(false);
     }
