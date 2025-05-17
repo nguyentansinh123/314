@@ -482,6 +482,81 @@ select:disabled {
   opacity: 0.7;
 }
 
+/* Benefits input styles */
+.benefits-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.benefits-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 35px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  background-color: #f0f4f8;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 14px;
+  color: #334155;
+  border: 1px solid #dbe1e8;
+}
+
+.benefit-item span {
+  margin-right: 6px;
+}
+
+.benefit-item button {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.benefit-item button:hover {
+  color: #ef4444;
+}
+
+.benefit-input-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.benefit-input-wrapper input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #dbe1e8;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.benefit-input-wrapper button {
+  background-color: #5d35f0;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.benefit-input-wrapper button:hover {
+  background-color: #4c2ac0;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .form-grid {

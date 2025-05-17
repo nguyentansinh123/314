@@ -8,6 +8,19 @@ const registerForEvent = async (req, res) => {
         const { eventId, ticketTypeId, quantity, paymentMethod } = req.body;
         const userId = req.body.userId;
 
+        // Check if the user is already registered for this event
+        const existingRegistration = await Registration.findOne({
+            event: eventId,
+            user: userId
+        });
+        
+        if (existingRegistration) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'You are already registered for this event' 
+            });
+        }
+
         const event = await Event.findById(eventId);
         if (!event) {
             return res.status(404).json({ success: false, error: 'Event not found' });
@@ -126,5 +139,42 @@ const adminForceUnattend = async (req, res) => {
     }
 };
 
+const confirmPayment = async (req, res) => {
+    try {
+        const { registrationId, paymentDetails } = req.body;
+        
+        const registration = await Registration.findById(registrationId);
+        
+        if (!registration) {
+            return res.status(404).json({ success: false, error: 'Registration not found' });
+        }
+        
+        // Update registration with payment info
+        registration.paymentStatus = 'completed';
+        registration.paymentDetails = {
+            transactionId: paymentDetails.transactionId,
+            paymentMethod: paymentDetails.paymentMethod,
+            amount: paymentDetails.amount,
+            paidAt: new Date()
+        };
+        
+        await registration.save();
+        
+        // Update event ticket sales
+        await Event.findOneAndUpdate(
+            { _id: registration.event, 'ticketTypes._id': registration.ticketType },
+            { $inc: { 'ticketTypes.$.sold': registration.quantity } }
+        );
+        
+        return res.status(200).json({
+            success: true,
+            message: 'Payment confirmed successfully',
+            registration
+        });
+    } catch (error) {
+        console.error('Error confirming payment:', error);
+        return res.status(500).json({ success: false, error: 'Server error' });
+    }
+};
 
-module.exports = { registerForEvent, unattendEvent, getEventAttendees, adminForceUnattend };
+module.exports = { registerForEvent, unattendEvent, getEventAttendees, adminForceUnattend, confirmPayment };

@@ -61,6 +61,30 @@ const EditEvent = () => {
     instagramHandle: ''
   });
 
+  const [benefitInput, setBenefitInput] = useState('');
+
+  const addBenefitToTicket = (index) => {
+    if (benefitInput && !ticketTypes[index].benefits.includes(benefitInput.trim())) {
+      const updatedTickets = [...ticketTypes];
+      updatedTickets[index].benefits = [...(updatedTickets[index].benefits || []), benefitInput.trim()];
+      setTicketTypes(updatedTickets);
+      setBenefitInput('');
+    }
+  };
+
+  const removeBenefitFromTicket = (ticketIndex, benefitIndex) => {
+    const updatedTickets = [...ticketTypes];
+    updatedTickets[ticketIndex].benefits.splice(benefitIndex, 1);
+    setTicketTypes(updatedTickets);
+  };
+
+  const handleBenefitKeyDown = (e, index) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addBenefitToTicket(index);
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -835,6 +859,37 @@ const EditEvent = () => {
                           onChange={(e) => handleTicketChange(index, 'isVIP', e.target.checked)}
                         />
                         <label htmlFor={`ticketVIP-${index}`}>VIP Ticket</label>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Ticket Benefits</label>
+                      <div className="benefits-input-container">
+                        <div className="benefits-list">
+                          {ticket.benefits && ticket.benefits.map((benefit, benefitIndex) => (
+                            <div key={benefitIndex} className="benefit-item">
+                              <span>{benefit}</span>
+                              <button 
+                                type="button" 
+                                onClick={() => removeBenefitFromTicket(index, benefitIndex)}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="benefit-input-wrapper">
+                          <input
+                            type="text"
+                            value={benefitInput}
+                            onChange={(e) => setBenefitInput(e.target.value)}
+                            onKeyDown={(e) => handleBenefitKeyDown(e, index)}
+                            placeholder="Add benefit and press Enter"
+                          />
+                          <button type="button" onClick={() => addBenefitToTicket(index)}>
+                            Add
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

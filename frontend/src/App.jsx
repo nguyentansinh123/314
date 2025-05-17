@@ -15,6 +15,7 @@ import EditEvent from "./components/EditEvent/EditEvent";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Profile from "./components/Profile/Profile";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
+import EventReview from './components/EventReview/EventReview';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -26,10 +27,10 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Home />} />
           <Route path="/event/:id" element={<SinglePage />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           
           <Route element={<ProtectedRoute />}>
             <Route path="/payment" element={<Payment />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
           </Route>
           
           <Route element={<ProtectedRoute allowedRoles={['organizer', 'admin']} />}>
@@ -42,6 +43,7 @@ function App() {
           </Route>
           
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/review-event/:eventId" element={<EventReview />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>

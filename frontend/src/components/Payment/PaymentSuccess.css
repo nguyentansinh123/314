@@ -1,5 +1,5 @@
 .success-container {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 0 24px 48px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -13,100 +13,173 @@
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   text-align: center;
+  margin-top: 40px;
+}
+
+.success-header {
+  text-align: center;
+  margin-bottom: 40px;
 }
 
 .success-icon {
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
-.success-content h1 {
+.success-header h1 {
   font-size: 28px;
   font-weight: 700;
-  margin-bottom: 16px;
-  color: #111827;
+  color: #4CAF50;
+  margin-bottom: 8px;
 }
 
-.success-message {
+.success-header p {
   font-size: 16px;
   color: #6b7280;
+}
+
+.ticket-details {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 24px;
   margin-bottom: 32px;
 }
 
-.order-confirmation {
-  background-color: #f9fafb;
-  border-radius: 8px;
-  padding: 24px;
-  margin-bottom: 24px;
-}
-
-.order-confirmation-detail {
+.ticket-header {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.order-confirmation-detail:last-child {
-  border-bottom: none;
+.ticket-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
 }
 
-.email-note {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 32px;
+.ticket-number {
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: 600;
+  color: #5d35f0;
+  background-color: #f5f3ff;
+  padding: 6px 12px;
+  border-radius: 6px;
 }
 
-.success-actions {
+.ticket-info {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   gap: 16px;
 }
 
-.primary-button {
-  background-color: #3b82f6;
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.info-item .label {
+  font-size: 14px;
+  color: #6b7280;
+  min-width: 120px;
+}
+
+.info-item .value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111827;
+  text-align: right;
+  flex: 1;
+}
+
+.extras-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: right;
+}
+
+.extras-list li {
+  margin-bottom: 4px;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.view-tickets-btn {
+  padding: 12px 24px;
+  background-color: #5d35f0;
   color: white;
-  padding: 12px 24px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.primary-button:hover {
-  background-color: #2563eb;
+.view-tickets-btn:hover {
+  background-color: #4c2ac0;
 }
 
-.secondary-button {
-  background-color: transparent;
-  border: 1px solid #d1d5db;
-  color: #4b5563;
+.back-to-events-btn {
   padding: 12px 24px;
-  border-radius: 6px;
+  background-color: white;
+  color: #5d35f0;
+  border: 1px solid #5d35f0;
+  border-radius: 8px;
   font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.secondary-button:hover {
-  background-color: #f9fafb;
+.back-to-events-btn:hover {
+  background-color: #f5f3ff;
 }
 
-.buy-btn {
-  background-color: #10b981;
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+.success-note {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 32px;
 }
 
-.buy-btn:hover {
-  background-color: #059669;
+.success-note p {
+  margin: 8px 0;
+}
+
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: column;
+  }
+  
+  .ticket-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .info-item .value,
+  .extras-list {
+    text-align: left;
+  }
 }
 
 @media (max-width: 640px) {
