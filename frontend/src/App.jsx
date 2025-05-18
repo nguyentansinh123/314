@@ -17,6 +17,7 @@ import Profile from "./components/Profile/Profile";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import EventReview from './components/EventReview/EventReview';
 import MyEvent from './pages/MyEvent/MyEvent'; 
+import MyTickets from './pages/MyTickets/MyTickets';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -42,6 +43,10 @@ function App() {
           
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />
+          </Route>
+          
+          <Route element={<ProtectedRoute allowedRoles={['user', 'organizer', 'admin']} />}>
+            <Route path="/my-tickets" element={<MyTickets />} />
           </Route>
           
           <Route path="/admin/dashboard" element={<AdminDashboard />} />

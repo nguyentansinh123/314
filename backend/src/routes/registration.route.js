@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { registerForEvent, unattendEvent, getEventAttendees, adminForceUnattend, confirmPayment, getEventAttendeesForOrganizer } = require('../controller/registration.controller');
+const { registerForEvent, unattendEvent, getEventAttendees, adminForceUnattend, confirmPayment, getEventAttendeesForOrganizer, getMyTickets } = require('../controller/registration.controller');
 const userAuth = require('../middleware/userAuth');
 const authorizeRoles = require('../middleware/roleMiddleware');
 
@@ -53,5 +53,12 @@ router.post(
     confirmPayment
 );
 
+// user routes
+router.get(
+    '/my-tickets',
+    userAuth,
+    authorizeRoles('user', 'organizer', 'admin'),
+    getMyTickets
+);
 
 module.exports = router;

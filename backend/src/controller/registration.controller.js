@@ -231,11 +231,64 @@ const getEventAttendeesForOrganizer = async (req, res) => {
     }
 };
 
+const getMyTickets = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        
+        // Find all registrations for this user
+        const registrations = await Registration.find({ user: userId })
+            .populate({
+                path: 'event',
+                select: 'title startDate endDate location images'
+            })
+            .sort({ createdAt: -1 });
+            
+        // Format the data for the frontend
+        const formattedRegistrations = registrations.map(reg => {
+            const event = reg.event;
+            const featuredImage = event.images.find(img => img.isFeatured)?.url || '';
+            
+            return {
+                registrationId: reg._id,
+                event: {
+                    _id: event._id,
+                    title: event.title,
+                    startDate: event.startDate,
+                    endDate: event.endDate,
+                    venue: event.location.venue,
+                    city: event.location.address.city,
+                    featuredImage: featuredImage
+                },
+                ticketType: reg.ticketTypeName,
+                quantity: reg.quantity,
+                paymentStatus: reg.paymentStatus,
+                registeredAt: reg.createdAt,
+                isVIP: reg.isVIP,
+                ticketNumber: reg.ticketNumber
+            };
+        });
+        
+        res.json({
+            success: true,
+            count: registrations.length,
+            registrations: formattedRegistrations
+        });
+        
+    } catch (err) {
+        console.error('Error getting user tickets:', err);
+        res.status(500).json({ 
+            success: false, 
+            error: err.message || 'Server Error' 
+        });
+    }
+};
+
 module.exports = { 
     registerForEvent, 
     unattendEvent, 
     getEventAttendees, 
     adminForceUnattend, 
     confirmPayment,
-    getEventAttendeesForOrganizer
+    getEventAttendeesForOrganizer,
+    getMyTickets
 };
