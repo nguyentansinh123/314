@@ -218,7 +218,8 @@ const getEventAttendeesForOrganizer = async (req, res) => {
                 quantity: reg.quantity,
                 paymentStatus: reg.paymentStatus,
                 registeredAt: reg.createdAt,
-                isVIP: reg.isVIP
+                isVIP: reg.isVIP,
+                ticketNumber: reg.ticketNumber
             }))
         });
     } catch (err) {

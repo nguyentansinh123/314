@@ -1,0 +1,494 @@
+.myEvents-app-container {
+  min-height: 100vh;
+  background-color: #f8f9fc;
+}
+
+.myEvents-page {
+  margin-top: 80px; /* Space for navbar */
+  min-height: calc(100vh - 80px);
+}
+
+.myEvents-page-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Dashboard header */
+.myEvents-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.myEvents-dashboard-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+/* Stats cards */
+.myEvents-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.myEvents-stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.myEvents-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.09);
+}
+
+.myEvents-stat-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #5d35f0;
+  margin-bottom: 0.5rem;
+}
+
+.myEvents-stat-label {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Events list */
+.myEvents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.myEvents-event-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.myEvents-event-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.09);
+}
+
+.myEvents-event-header {
+  display: flex;
+  padding: 0;
+}
+
+.myEvents-event-image {
+  width: 300px;
+  height: 200px;
+  object-fit: cover;
+}
+
+.myEvents-event-info {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.myEvents-event-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.myEvents-event-info h2 {
+  font-size: 1.8rem;
+  margin: 0;
+  color: #333;
+}
+
+.myEvents-status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.myEvents-status-published {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
+.myEvents-status-draft {
+  background-color: rgba(255, 152, 0, 0.15);
+  color: #ff9800;
+}
+
+.myEvents-status-cancelled {
+  background-color: rgba(244, 67, 54, 0.15);
+  color: #f44336;
+}
+
+.myEvents-event-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.myEvents-meta-item {
+  display: flex;
+  align-items: center;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.myEvents-meta-item svg {
+  margin-right: 0.5rem;
+  stroke-width: 1.5;
+}
+
+.myEvents-event-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+/* Attendees section */
+.myEvents-attendees-section {
+  padding: 1.5rem;
+  border-top: 1px solid #eee;
+  background-color: #fafafa;
+}
+
+.myEvents-attendees-section h3 {
+  font-size: 1.3rem;
+  margin: 0 0 1.5rem 0;
+  color: #333;
+}
+
+.myEvents-table-responsive {
+  overflow-x: auto;
+}
+
+.myEvents-attendees-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.myEvents-attendees-table th, .myEvents-attendees-table td {
+  padding: 1rem;
+  text-align: left;
+}
+
+.myEvents-attendees-table th {
+  background-color: #f4f5f9;
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.myEvents-attendees-table tr {
+  border-bottom: 1px solid #eee;
+}
+
+.myEvents-attendees-table tr:last-child {
+  border-bottom: none;
+}
+
+.myEvents-attendees-table tbody tr:hover {
+  background-color: #f8f9ff;
+}
+
+.myEvents-payment-badge {
+  padding: 0.35rem 0.7rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.myEvents-payment-paid {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
+.myEvents-payment-pending {
+  background-color: rgba(255, 152, 0, 0.15);
+  color: #ff9800;
+}
+
+.myEvents-payment-failed, .myEvents-payment-cancelled {
+  background-color: rgba(244, 67, 54, 0.15);
+  color: #f44336;
+}
+
+.myEvents-payment-refunded {
+  background-color: rgba(33, 150, 243, 0.15);
+  color: #2196f3;
+}
+
+.myEvents-vip-badge {
+  background-color: rgba(156, 39, 176, 0.15);
+  color: #9c27b0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.myEvents-standard-badge {
+  background-color: rgba(96, 125, 139, 0.15);
+  color: #607d8b;
+  padding: 0.35rem 0.7rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Empty state */
+.myEvents-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.myEvents-empty-icon {
+  margin-bottom: 1.5rem;
+}
+
+.myEvents-empty-state h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.myEvents-empty-state p {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* Empty attendees */
+.myEvents-empty-attendees {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #666;
+  text-align: center;
+}
+
+.myEvents-empty-attendees svg {
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+/* Loaders */
+.myEvents-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+}
+
+.myEvents-attendees-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.myEvents-loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #5d35f0;
+  border-radius: 50%;
+  animation: myEventsSpin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.myEvents-loader.small {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+}
+
+@keyframes myEventsSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error */
+.myEvents-error-container {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.myEvents-error-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #ffebee;
+  color: #f44336;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0 auto 1.5rem;
+}
+
+.myEvents-error-container h3 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.myEvents-error-container p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Auth message */
+.myEvents-auth-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+}
+
+.myEvents-auth-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2rem;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.myEvents-auth-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+/* Buttons */
+.myEvents-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: none;
+}
+
+.myEvents-btn svg {
+  margin-right: 0.5rem;
+}
+
+.myEvents-btn-primary {
+  background-color: #5d35f0;
+  color: white;
+}
+
+.myEvents-btn-primary:hover {
+  background-color: #4926d9;
+}
+
+.myEvents-btn-secondary {
+  background-color: #607d8b;
+  color: white;
+}
+
+.myEvents-btn-secondary:hover {
+  background-color: #546e7a;
+}
+
+.myEvents-btn-outline {
+  background-color: transparent;
+  color: #5d35f0;
+  border: 1px solid #5d35f0;
+}
+
+.myEvents-btn-outline:hover {
+  background-color: #f5f2ff;
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .myEvents-event-header {
+    flex-direction: column;
+  }
+  
+  .myEvents-event-image {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .myEvents-event-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .myEvents-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .myEvents-dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .myEvents-attendees-table {
+    font-size: 0.85rem;
+  }
+  
+  .myEvents-attendees-table th, .myEvents-attendees-table td {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .myEvents-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .myEvents-event-meta {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .myEvents-page-content {
+    padding: 1rem;
+  }
+}

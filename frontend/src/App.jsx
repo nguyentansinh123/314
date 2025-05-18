@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Profile from "./components/Profile/Profile";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import EventReview from './components/EventReview/EventReview';
+import MyEvent from './pages/MyEvent/MyEvent'; 
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['organizer', 'admin']} />}>
             <Route path="/create-event" element={<CreateEvent />} />
             <Route path="/edit-event/:id" element={<EditEvent />} />
+            <Route path="/myEvent" element={<MyEvent />} /> {/* Add the protected route for MyEvent */}
           </Route>
           
           <Route element={<ProtectedRoute />}>
