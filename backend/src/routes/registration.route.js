@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { registerForEvent, unattendEvent , getEventAttendees,adminForceUnattend, confirmPayment } = require('../controller/registration.controller');
+const { registerForEvent, unattendEvent, getEventAttendees, adminForceUnattend, confirmPayment, getEventAttendeesForOrganizer } = require('../controller/registration.controller');
 const userAuth = require('../middleware/userAuth');
 const authorizeRoles = require('../middleware/roleMiddleware');
 
@@ -20,6 +20,14 @@ router.delete(
     userAuth,
     authorizeRoles('admin'),
     adminForceUnattend
+);
+
+// organizer and admin
+router.get(
+    '/my-event-attendees/:eventId',
+    userAuth,
+    authorizeRoles('organizer', 'admin'),
+    getEventAttendeesForOrganizer
 );
 
 // all user

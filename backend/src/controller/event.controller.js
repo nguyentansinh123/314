@@ -692,6 +692,37 @@ const deleteTicketType = async (req, res) => {
     }
 };
 
+const getMyEvents = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const userRole = req.body.role;
+        
+        let query = {};
+        
+        if (userRole === 'organizer') {
+            query.organizer = userId;
+        } else if (userRole === 'admin' && req.query.onlyMine === 'true') {
+            query.organizer = userId;
+        }
+        
+        const events = await Event.find(query)
+            .populate('organizer', 'name email')
+            .sort({ createdAt: -1 });
+        
+        res.json({
+            success: true,
+            count: events.length,
+            data: events
+        });
+    } catch (err) {
+        console.error("Error fetching user events:", err);
+        res.status(500).json({
+            success: false,
+            error: 'Server Error: ' + err.message
+        });
+    }
+};
+
 module.exports = {
     getAllEvents,
     getEvent,
@@ -702,5 +733,6 @@ module.exports = {
     publishEvent,
     addTicketType,
     updateTicketType,
-    deleteTicketType
+    deleteTicketType,
+    getMyEvents
 };

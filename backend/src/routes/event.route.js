@@ -11,6 +11,7 @@ const {
   addTicketType,
   updateTicketType,
   deleteTicketType,
+  getMyEvents, // Add this new controller function
 } = require("../controller/event.controller");
 const userAuth = require("../middleware/userAuth");
 const authorizeRoles = require("../middleware/roleMiddleware");
@@ -27,6 +28,14 @@ router.post(
   userAuth,
   authorizeRoles("admin", "organizer"),
   createEvent
+);
+
+router.get(
+  "/my-events",
+  extractUserId,
+  userAuth,
+  authorizeRoles("admin", "organizer"),
+  getMyEvents
 );
 
 router.put(

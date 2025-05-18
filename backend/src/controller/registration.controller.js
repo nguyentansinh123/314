@@ -177,4 +177,64 @@ const confirmPayment = async (req, res) => {
     }
 };
 
-module.exports = { registerForEvent, unattendEvent, getEventAttendees, adminForceUnattend, confirmPayment };
+const getEventAttendeesForOrganizer = async (req, res) => {
+    try {
+        const eventId = req.params.eventId;
+        const userId = req.body.userId;
+        const userRole = req.body.role;
+
+        // First check if the event exists
+        const event = await Event.findById(eventId);
+        
+        if (!event) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Event not found' 
+            });
+        }
+
+        // If user is an organizer, verify they are the event creator
+        if (userRole === 'organizer' && event.organizer.toString() !== userId) {
+            return res.status(403).json({ 
+                success: false, 
+                error: 'You are not authorized to view attendees for this event' 
+            });
+        }
+
+        // Admin can view any event's attendees, organizer can only view their own events
+
+        // Get all registrations for this event
+        const registrations = await Registration.find({ event: eventId })
+            .populate('user', 'name email profilePicture')
+            .sort({ createdAt: -1 });
+
+        res.json({
+            success: true,
+            count: registrations.length,
+            attendees: registrations.map(reg => ({
+                registrationId: reg._id,
+                user: reg.user,
+                ticketType: reg.ticketTypeName,
+                quantity: reg.quantity,
+                paymentStatus: reg.paymentStatus,
+                registeredAt: reg.createdAt,
+                isVIP: reg.isVIP
+            }))
+        });
+    } catch (err) {
+        console.error('Error getting event attendees:', err);
+        res.status(500).json({ 
+            success: false, 
+            error: err.message || 'Server Error' 
+        });
+    }
+};
+
+module.exports = { 
+    registerForEvent, 
+    unattendEvent, 
+    getEventAttendees, 
+    adminForceUnattend, 
+    confirmPayment,
+    getEventAttendeesForOrganizer
+};
