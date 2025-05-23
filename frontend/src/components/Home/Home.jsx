@@ -60,7 +60,6 @@ const Home = () => {
       setLoading(true);
       setError("");
 
-      // Use the public endpoint that doesn't require auth
       const url = "http://localhost:5000/api/event/public";
       const response = await axios.get(url);
 

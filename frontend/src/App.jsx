@@ -18,6 +18,7 @@ import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import EventReview from './components/EventReview/EventReview';
 import MyEvent from './pages/MyEvent/MyEvent'; 
 import MyTickets from './pages/MyTickets/MyTickets';
+import Chat from './pages/Chat/Chat'; // Import the new Chat component
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -33,12 +34,13 @@ function App() {
           
           <Route element={<ProtectedRoute />}>
             <Route path="/payment" element={<Payment />} />
+            <Route path="/chat" element={<Chat />} /> {/* Add the chat route */}
           </Route>
           
           <Route element={<ProtectedRoute allowedRoles={['organizer', 'admin']} />}>
             <Route path="/create-event" element={<CreateEvent />} />
             <Route path="/edit-event/:id" element={<EditEvent />} />
-            <Route path="/myEvent" element={<MyEvent />} /> {/* Add the protected route for MyEvent */}
+            <Route path="/myEvent" element={<MyEvent />} />
           </Route>
           
           <Route element={<ProtectedRoute />}>
