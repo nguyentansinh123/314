@@ -19,36 +19,38 @@ import EventReview from './components/EventReview/EventReview';
 import MyEvent from './pages/MyEvent/MyEvent'; 
 import MyTickets from './pages/MyTickets/MyTickets';
 import { AuthProvider } from './context/AuthContext';
+import Notification from './components/Notification'; // ✅ Import Notification
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <Notification /> {/* ✅ Always visible */}
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Home />} />
           <Route path="/event/:id" element={<SinglePage />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
-          
+
           <Route element={<ProtectedRoute />}>
             <Route path="/payment" element={<Payment />} />
           </Route>
-          
+
           <Route element={<ProtectedRoute allowedRoles={['organizer', 'admin']} />}>
             <Route path="/create-event" element={<CreateEvent />} />
             <Route path="/edit-event/:id" element={<EditEvent />} />
-            <Route path="/myEvent" element={<MyEvent />} /> {/* Add the protected route for MyEvent */}
+            <Route path="/myEvent" element={<MyEvent />} />
           </Route>
-          
+
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />
           </Route>
-          
+
           <Route element={<ProtectedRoute allowedRoles={['user', 'organizer', 'admin']} />}>
             <Route path="/my-tickets" element={<MyTickets />} />
           </Route>
-          
+
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/review-event/:eventId" element={<EventReview />} />
           <Route path="*" element={<Navigate to="/" />} />
@@ -59,3 +61,4 @@ function App() {
 }
 
 export default App;
+
