@@ -15,7 +15,7 @@ const paypalRoutes = require('./routes/paypal.route');
 
 const app = express();
 const server = http.createServer(app); 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5050;
 const allowedOrigin = ['http://localhost:5173'];
 
 
