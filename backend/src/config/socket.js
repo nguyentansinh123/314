@@ -1,15 +1,20 @@
-const socketIO = require('socket.io');
+const { Server } = require('socket.io');
 
 let io;
 const userSocketMap = {}; // {userId: socketId}
 
 function initSocket(server) {
-  io = socketIO(server, {
+  io = new Server(server, {
     cors: {
       origin: ['http://localhost:5173'],
-      credentials: true
+      credentials: true,
+      methods: ['GET', 'POST']
     },
-    pingTimeout: 60000
+    // Important! Allow Socket.IO v2 clients to connect
+    allowEIO3: true,
+    // Other settings
+    pingTimeout: 60000,
+    transports: ['websocket', 'polling']
   });
 
   io.on('connection', (socket) => {
