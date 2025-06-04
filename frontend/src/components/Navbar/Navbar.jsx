@@ -56,7 +56,6 @@ const Navbar = () => {
         </div>
       </div>
       <div className="nav-right">
-        {/* Add Admin Dashboard link here, outside of user dropdown */}
         {user && user.role === 'admin' && (
           <Link to="/admin/dashboard" className="admin-dashboard-link">
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
